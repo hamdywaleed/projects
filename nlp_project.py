@@ -423,12 +423,6 @@ def get_predictions(model, data_loader):
   real_values = torch.stack(real_values).cpu()
   return review_texts, predictions, prediction_probs, real_values
 
-y_review_texts, y_pred, y_pred_probs, y_test = get_predictions(
-  model,
-  test_data_loader
-)
-
-print(classification_report(y_test, y_pred, target_names=class_names))
 
 def show_confusion_matrix(confusion_matrix):
   hmap = sns.heatmap(confusion_matrix, annot=True, fmt="d", cmap="Blues")
@@ -441,24 +435,3 @@ cm = confusion_matrix(y_test, y_pred)
 df_cm = pd.DataFrame(cm, index=class_names, columns=class_names)
 show_confusion_matrix(df_cm)
 
-def predict(review_text):
-      encoded_review = tokenizer.encode_plus(
-      review_text,
-      max_length=MAX_LEN,
-      add_special_tokens=True,
-      return_token_type_ids=False,
-      pad_to_max_length=True,
-      return_attention_mask=True,
-      return_tensors='pt',
-      )
-      input_ids = encoded_review['input_ids'].to(device)
-      attention_mask = encoded_review['attention_mask'].to(device)
-
-      output = model(input_ids, attention_mask)
-      _, prediction = torch.max(output, dim=1)
-
-      print(f'Review text: {review_text}')
-      print(f'Sentiment  : {class_names[prediction]}')
-
-review_text = "I love completing my todos! Best app ever!!!"
-predict(review_text)
